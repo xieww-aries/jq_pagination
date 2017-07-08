@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            margin:0;
+            padding:0;
+        }
+        #pagination {
+            height:50px;
+            position:absolute;
+            left:0;
+            top:0;
+        }
+        #pagination a {
+            width:10px;
+            height:50px;
+            margin-right:10px;
+            border:1px #00f solid;
+            background:pink;
+        }
+        #pagination span {
+            width:50px;
+            height:50px;
+            margin-right:10px;
+            border:1px #2C8DFB solid;
+        }
+        dl {
+            width:190px;
+            height:200px;
+            float:left;
+            margin-right:40px;
+            margin-bottom:80px;
+            margin-left:2px;
+        }
+        p {
+            width:190px;
+            height:30px;
+            font-size:14px;
+            color:#999;
+            background:pink;
+            margin-top:5px;
+        }
+        img {
+            width:190px;
+            height:200px;
+        }
+    </style>
+    <link rel="stylesheet" href="pagination.css"/>
+    <script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="jquery.pagination.js"></script>
+</head>
+<body>
+    <div id="pagination">
+
+    </div>
+</body>
+</html>
+<script>
+    $(function(){
+        var showNum = 4;
+        //先加载数据再进行分页
+        $.ajax({
+            url : "info.json",
+            type : "GET",
+            success : function(data){
+                console.log(data);
+                fn_success(data,showNum);
+            },
+            error : function(){
+                alert('页面加载失败');
+            }
+        });
+
+        function fn_success(data,showNum) {
+            $("#pagination").pagination(data.length,    //分布总数量，必须参数
+                {
+                    prev_text: "上一页",
+                    next_text: "下一页",
+                    items_per_page: showNum,
+                    num_edge_entries: 2,    //两侧首尾分页条目数
+                    num_display_entries: 2, //连续分页主体部分分页条目数
+                    current_page: 0,   //当前页索引
+                    callback : function(index){
+                                    //渲染页面
+                                    renderPage(index,data,showNum);
+                                }  //PageCallback() 为翻页调用次函数。
+                })
+        }
+
+        function renderPage(index,data,showNum){
+            var str = "";
+            for(var i = index*showNum;i < (index+1)*showNum;i ++){
+                if(i < data.length){
+                    str +=`
+                    <dl>
+                        <dt>
+                            <img src="${data[i].imgSrc}"/>
+                        </dt>
+                        <dd>
+                            <p>${data[i].id}</p>
+                            <p>${data[i].product}</p>
+                        </dd>
+                    </dl>
+                `
+                }
+            }
+            $('#pagination').append(str);
+        }
+    })
+</script>
